@@ -54,7 +54,6 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     // fragment
     implementation("androidx.fragment:fragment-ktx:1.8.9")
-    implementation(libs.androidx.junit.ktx)
     val lifecycle_version = "2.9.4"
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
