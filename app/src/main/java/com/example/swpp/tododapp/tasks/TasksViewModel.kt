@@ -38,6 +38,9 @@ class TasksViewModel(
 
     private val _forceUpdate = MutableLiveData<Boolean>(false)
 
+    private val _dataLoading = MutableLiveData<Boolean>()
+    val dataLoading: LiveData<Boolean> = _dataLoading
+
     private val _items: LiveData<List<Task>> = _forceUpdate.switchMap { forceUpdate ->
         if (forceUpdate) {
             _dataLoading.value = true
@@ -51,9 +54,6 @@ class TasksViewModel(
     }
 
     val items: LiveData<List<Task>> = _items
-
-    private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean> = _dataLoading
 
     private val _currentFilteringLabel = MutableLiveData<Int>()
     val currentFilteringLabel: LiveData<Int> = _currentFilteringLabel
@@ -183,23 +183,17 @@ class TasksViewModel(
         _snackbarText.value = Event(message)
     }
 
-    private fun filterTasks(tasksResult: Result<List<Task>>): LiveData<List<Task>> {
-        // TODO: This is a good case for liveData builder. Replace when stable.
-        val result = MutableLiveData<List<Task>>()
-
+    private fun filterTasks(tasksResult: Result<List<Task>>): LiveData<List<Task>> = liveData {
         if (tasksResult is Success) {
             isDataLoadingError.value = false
-            viewModelScope.launch {
-                result.value = filterItems(tasksResult.data, currentFiltering)
-            }
+            emit(filterItems(tasksResult.data, currentFiltering))
         } else {
-            result.value = emptyList()
             showSnackbarMessage(R.string.loading_tasks_error)
             isDataLoadingError.value = true
+            emit(emptyList())
         }
-
-        return result
     }
+
 
     /**
      * @param forceUpdate   Pass in true to refresh the data in the [TasksDataSource]
@@ -237,4 +231,3 @@ class TasksViewModelFactory (
     override fun <T : ViewModel> create(modelClass: Class<T>) =
         (TasksViewModel(tasksRepository) as T)
 }
-
